@@ -18,6 +18,8 @@ export interface Weather {
   humidity: number;
   description: string;
   isMock: boolean;
+  /** 城市名（真实天气时由反向地理填入；用默认坐标时为「上海（默认）」）。 */
+  city?: string;
 }
 
 export interface RecipeIngredient {

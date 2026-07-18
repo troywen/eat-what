@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { getWeatherService } from '../core/services/weather'
+import { amapWeatherService, hasAmapWeatherConfig, mockWeatherService } from '../core/services/weather'
+import {
+  createOpenMeteoService,
+  DEFAULT_COORDS,
+  getBrowserCoords,
+  reverseGeocode,
+} from '../core/services/openMeteo'
 import type { Weather, WeatherCondition } from '../core/types'
 
 /** 「自己填天气」表单提交的手动天气输入。 */
@@ -31,6 +37,32 @@ const DEFAULT_DESCRIPTION: Record<WeatherCondition, string> = {
 const TEMP_MIN = -40
 const TEMP_MAX = 50
 
+/**
+ * 自动天气降级链：高德（有 Key）> Open-Meteo 实时（定位坐标，失败用默认上海坐标）> mock。
+ * Open-Meteo 成功即为真实天气（isMock: false）；默认坐标时 city 标「上海（默认）」。
+ */
+async function fetchAutoWeather(): Promise<Weather> {
+  if (hasAmapWeatherConfig()) {
+    try {
+      return await amapWeatherService.getCurrent()
+    } catch {
+      return mockWeatherService.getCurrent()
+    }
+  }
+  const browserCoords = await getBrowserCoords(5000)
+  const coords = browserCoords ?? DEFAULT_COORDS
+  try {
+    const [weather, city] = await Promise.all([
+      createOpenMeteoService(coords).getCurrent(),
+      // 默认坐标不查反向地理，直接标注；定位成功才查城市名
+      browserCoords ? reverseGeocode(coords) : Promise.resolve(null),
+    ])
+    return { ...weather, city: city ?? (browserCoords ? undefined : '上海（默认）') }
+  } catch {
+    return mockWeatherService.getCurrent()
+  }
+}
+
 export function useWeather() {
   const [weather, setWeather] = useState<Weather | null>(null)
   const [loading, setLoading] = useState(true)
@@ -40,7 +72,7 @@ export function useWeather() {
   const refresh = useCallback(async () => {
     setLoading(true)
     try {
-      setWeather(await getWeatherService().getCurrent())
+      setWeather(await fetchAutoWeather())
       setIsManual(false)
     } finally {
       setLoading(false)
@@ -70,7 +102,7 @@ export function useWeather() {
     return true
   }, [])
 
-  /** 恢复自动：重新走天气服务（mock 启发式 / 高德 API）生成天气。 */
+  /** 恢复自动：重走降级链（高德 > Open-Meteo > mock）。 */
   const resetToAuto = useCallback(() => {
     void refresh()
   }, [refresh])

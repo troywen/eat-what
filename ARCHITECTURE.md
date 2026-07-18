@@ -73,9 +73,9 @@ Demo 阶段全部提供 Mock 实现 + 真实接口预留，接口先行：
 
 | 服务 | 接口 | Demo 实现 | 生产实现 |
 |---|---|---|---|
-| `WeatherService` | `getCurrent(): Weather` | 按月份/小时启发式模拟，可手动切换 | 高德/和风天气 API |
+| `WeatherService` | `getCurrent(): Weather` | 按月份/小时启发式模拟，可手动切换 | Open-Meteo（默认，免 Key）/ 高德（有 Key 切换） |
 | `VideoService` | `getGuides(dish): VideoGuide[]` | 生成 B站/抖音搜索直达链接 | 接入开放平台搜索 API |
-| `AmapService` | `getStreetRank(city): Place[]` | 内置「扫街榜」Mock 数据 + 高德 URI 跳转 | 高德 Web 服务 API（Key 走环境变量） |
+| `AmapService` | `getStreetRank(city): Place[]` | 内置「扫街榜」Mock 数据 + 高德 URI 跳转 | 生产环境经自有服务端调用高德 POI API，Key 不下发前端 |
 
 视频链接采用搜索直达 URL（`search.bilibili.com/all?keyword=xx做法`、`douyin.com/search/xx做法`），无需 API Key 即可用。
 
@@ -98,5 +98,5 @@ Demo 阶段全部提供 Mock 实现 + 真实接口预留，接口先行：
 | 调推荐口味 | `core/engine/weights.ts` |
 | 加打分维度 | 新建 `core/engine/scorers/xxx.ts` → 注册进 `pipeline.ts` |
 | 加菜谱 | `core/data/recipes.ts` |
-| 接真实天气 | 实现 `WeatherService` 接口替换 mock |
+| 接真实天气 | 已接入 Open-Meteo（`core/services/openMeteo.ts`）；换别的源就实现 `WeatherService` 接口 |
 | 接高德 API | 实现 `AmapService` 接口替换 mock |

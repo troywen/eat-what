@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Droplets, Pencil, RefreshCw } from 'lucide-react'
+import { Droplets, MapPin, Pencil, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { getMealSlot } from '../core/services/weather'
 import type { Weather, WeatherCondition } from '../core/types'
@@ -114,6 +114,11 @@ export default function Hero({ weather, loading, isManual, onRefresh, onSetManua
               <span className="inline-flex items-center gap-1">
                 <Droplets className="h-3 w-3" /> 湿度 {weather?.humidity ?? '--'}%
               </span>
+              {weather?.city && (
+                <span className="inline-flex items-center gap-0.5">
+                  <MapPin className="h-3 w-3" /> {weather.city}
+                </span>
+              )}
               <span>{weather?.description ?? ''}</span>
             </div>
           </div>

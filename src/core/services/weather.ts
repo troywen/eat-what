@@ -97,6 +97,11 @@ export const amapWeatherService: WeatherService = {
   },
 };
 
+/** 是否配置了高德天气（VITE_AMAP_KEY + VITE_AMAP_CITY）。 */
+export function hasAmapWeatherConfig(): boolean {
+  return Boolean(AMAP_KEY && AMAP_CITY);
+}
+
 /** 服务选择：配了高德 Key 用真实天气，否则回落 Mock。 */
 export function getWeatherService(): WeatherService {
   return AMAP_KEY && AMAP_CITY ? amapWeatherService : mockWeatherService;
