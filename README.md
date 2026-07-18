@@ -1,97 +1,47 @@
-# 吃点啥 (Eat What)
+# 等一下吃什么 (Eat What)
 
-> 今天吃什么？让 AI 帮你决定！
+> 解决选择困难症：根据你的食材、天气、时间和心情，三秒决定今天吃什么。
 
-一个基于 React + TypeScript + Vite 的「今天吃什么」推荐应用，帮助你解决每日的世纪难题。
+🌐 **在线 Demo**：https://troywen.github.io/eat-what/
 
-## ✨ 功能特性
+## ✨ 功能
 
-- 🎲 **随机推荐** - 一键随机选择今天吃什么
-- 🍜 **分类筛选** - 按菜系、口味、场景筛选
-- ❤️ **收藏功能** - 收藏你喜欢的餐厅/菜品
-- 📝 **自定义列表** - 添加你自己的选择列表
-- 🌐 **多语言支持** - 中英文界面切换
-- 📱 **响应式设计** - 完美适配移动端和桌面端
+- 🍳 **自己做饭**：点选冰箱现有食材（也可自定义输入），结合实时天气、餐段、心情、可用时间与口味轻重，推荐 Top 3 菜谱——含精确用量、分步做法、B站/抖音视频指导
+- 🛵 **点外卖 / 🥢 外出吃**：热门 + 时令 + 高德扫街榜商户推荐，一键跳转高德地图
+- 🎡 **菜系转盘**：12 个菜系随机/自选，转到什么吃什么
+- 💭 **一句话心情**：输入「加班到九点，累瘫」自动解析心情（125 词本地词表，已预留 AI 分析接口）
+- 📷 **手账记录**：拍立得照片墙记录每一餐，周报统计「本周吃了啥」，记录回流推荐引擎自动降权——越用越懂你
+- 🛒 缺料采购清单一键复制 · 忌口硬过滤 · 1~4 人份用量智能换算
 
-## 🚀 快速开始
+## 🧠 推荐算法
 
-### 安装依赖
+打分器管道（Scorer Pipeline）：8 个独立可插拔维度加权求和——食材匹配 0.32 / 时间 0.20 / 天气 0.15 / 心情 0.12 / 口味 0.08 / 季节 0.08 / 热度 0.04 / 多样性 0.01，外加荤素多样性约束与忌口/最近吃过的硬过滤。每次推荐附完整中文打分分解，可解释。
+
+## 🏗️ 架构
+
+`src/core/` 为**零 React 依赖的纯 TypeScript 层**（领域模型 / 推荐引擎 / 数据 / 服务接口），可直接抽至服务端 npm 包或打包进 App；外部服务全部「接口 + Mock / 真实实现」可插拔：
+
+| 服务 | Demo | 生产 |
+|---|---|---|
+| 天气 | Open-Meteo（免 Key）+ 手动输入 | 高德天气（配 `VITE_AMAP_KEY` 自动切换） |
+| 视频 | B站/抖音搜索直达 | 开放平台 API |
+| 地图 | 内置榜单 + 高德 URI 跳转 | 服务端代理高德 POI API（Key 不下发前端） |
+
+详见 [ARCHITECTURE.md](./ARCHITECTURE.md)。
+
+## 🚀 开发
 
 ```bash
 npm install
+npm run dev      # 开发
+npm run test     # 235 个单元测试（vitest）
+npm run build    # 构建 → dist/
 ```
 
-### 开发模式
+## 🚢 部署
 
-```bash
-npm run dev
-```
-
-### 构建生产版本
-
-```bash
-npm run build
-```
-
-### 预览构建结果
-
-```bash
-npm run preview
-```
-
-## 🛠️ 技术栈
-
-- **前端框架**: React 18 + TypeScript
-- **构建工具**: Vite 6
-- **样式方案**: Tailwind CSS + PostCSS
-- **UI 组件**: shadcn/ui + Radix UI
-- **图标库**: Lucide React
-
-## 📦 项目结构
-
-```
-eat-what/
-├── src/
-│   ├── components/     # React 组件
-│   ├── hooks/          # 自定义 Hooks
-│   ├── utils/          # 工具函数
-│   ├── types/          # TypeScript 类型定义
-│   └── App.tsx         # 主应用组件
-├── public/             # 静态资源
-├── index.html          # HTML 入口
-├── vite.config.ts      # Vite 配置
-├── tailwind.config.js  # Tailwind 配置
-└── tsconfig.json       # TypeScript 配置
-```
-
-## 🌍 部署
-
-### GitHub Pages
-
-```bash
-npm run build
-npx gh-pages -d dist
-```
-
-### Vercel
-
-```bash
-npm install -g vercel
-vercel
-```
-
-### Netlify
-
-拖拽 `dist` 文件夹到 Netlify 即可。
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
+push 到 `master` 即触发 GitHub Actions：跑全部测试 → 构建 → 发布到 GitHub Pages，测试不过不上线。
 
 ## 📄 许可证
 
 MIT License
-
----
-
-**今天吃什么？打开应用，让 AI 帮你决定！** 🍽️
